@@ -9,12 +9,12 @@ your images datastore.
 
 - [ONBackup](#onbackup)
   - [Table of Contents](#table-of-contents)
-  - [Todos](#todos)
+  - [TODO list](#todo-list)
   - [Dependencies](#dependencies)
   - [Configuration](#configuration)
   - [License](#license)
 
-## Todos
+## TODO list
 
 - [x] Perform a ceph pool full backup
 - [x] Perform a ceph pool differential backup
