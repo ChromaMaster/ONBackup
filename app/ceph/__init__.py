@@ -44,7 +44,6 @@ def load_config():
     logger.info("Loading ceph config...")
     with open(CONFIG_FILE, 'r') as ymlfile:
         config = yaml.load(ymlfile)
-
     return config
 
 

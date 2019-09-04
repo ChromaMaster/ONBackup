@@ -19,15 +19,14 @@ class Ceph():
     """
 
     def __init__(self, conf_file: str, user_keyring: str, client: str, pool: str, 
-                images: list, backup_dir: str):
-        # super(CephBackup, self).__init__(conf_file, user_keyring, client)
+                images: list, backup_dir: str):        
 
         # Cluster parameters
         self.user_keyring = user_keyring
         self._handler = rados.Rados(
-            conffile=conf_file, conf=dict(keyring=user_keyring), name=client)
+            conffile=conf_file, conf=dict(keyring=user_keyring), name=f"client.{client}")
 
-        logger.info("\nlibrados version: {}".format(str(self._handler.version())))
+        logger.info("librados version: {}".format(str(self._handler.version())))
 
         # Connect to the cluster
         self.connect()
@@ -143,7 +142,7 @@ class Ceph():
         print(f"{Color.BOLD}Images to backup{Color.END}")
         for image in self._images:
             print(f"\t{self._pool}/{image}")
-        print(f"{Color.BOLD}Backup directory:{Color.END}\n\t{self._backup_dir}")
+        print(f"{Color.BOLD}Backup directory:{Color.END}\n\t{self._backup_dir}\n")        
 
     def print_image_snapshots(self, image_name: str):
         """

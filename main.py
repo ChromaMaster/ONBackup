@@ -16,16 +16,16 @@ def parse_args(parser: ArgumentParser, ceph_config: dict):
         '--ceph',
         metavar="PATH",
         help="Path of the ceph config file",
-        default=ceph.default_config["cluster"]["conf_file"])
+        default=ceph_config["cluster"]["conf_file"])
     parser.add_argument(
         '--user_keyring',
         metavar="PATH",
         help="Path of the client keyring file",
-        default=ceph.default_config["cluster"]["user_keyring"])
+        default=ceph_config["cluster"]["user_keyring"])
     parser.add_argument(
         '--user',
         help="Client name (without 'client.' prefix)",
-        default=ceph.default_config["cluster"]["client"])
+        default=ceph_config["cluster"]["client"])
     parser.add_argument('-p', '--pool', help="Source pool name")
     parser.add_argument(
         '-i',
@@ -48,7 +48,7 @@ def parse_args(parser: ArgumentParser, ceph_config: dict):
 
     args = parser.parse_args()
 
-    # There are always correct default values
+    # Use the values provided by the current config file (or default if not exists)
     ceph_config["cluster"]["conf_file"] = args.ceph
     ceph_config["cluster"]["user_keyring"] = args.user_keyring
     ceph_config["cluster"]["user"] = args.user
@@ -105,5 +105,4 @@ if __name__ == "__main__":
     # Checks if config has all the required fields
     ceph.check_config(ceph_config)
 
-    print(ceph_config)
     main()
