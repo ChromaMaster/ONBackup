@@ -14,6 +14,8 @@ CONFIG_DIR = Path("etc")
 DEFAULT_CONFIG_FILE = CONFIG_DIR.joinpath("ceph_default.yaml")
 CONFIG_FILE = CONFIG_DIR.joinpath("ceph.yaml")
 
+AVAILABLES_BACKUP_TYPES = ["full", "diff"]
+
 default_config = {
     "cluster": {
         "conf_file": "etc/ceph/ceph.conf",
@@ -52,5 +54,13 @@ def check_config(config):
     backup_config = config["backup"]
     if not backup_config["pool"].strip():
         logger.critical("Backup pool not set")
+        raise
     if not backup_config["directory"].strip():
         logger.critical("Backup directory not set")
+        raise
+    if backup_config["type"] not in AVAILABLES_BACKUP_TYPES:
+        logger.critical(f"Backup type \"{backup_config['type']}\" not allowed, please use {AVAILABLES_BACKUP_TYPES}")
+        raise    
+    if not Path(backup_config["directory"]).exists():
+        logger.critical(f"Backup directory \"{backup_config['directory']}\" does not exist")
+        raise

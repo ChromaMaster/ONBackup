@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 import os
+import sys
 os.environ['BASE_PATH'] = os.path.abspath(os.path.dirname(__file__))
 
 from app import ceph
@@ -103,6 +104,9 @@ if __name__ == "__main__":
     parse_args(parser, ceph_config)
 
     # Checks if config has all the required fields
-    ceph.check_config(ceph_config)
+    try:
+        ceph.check_config(ceph_config)
+    except:
+        sys.exit(1)
 
     main()
