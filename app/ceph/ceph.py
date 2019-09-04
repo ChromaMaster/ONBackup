@@ -40,15 +40,28 @@ class Ceph():
         self._dummy_snap_name = "dummy"            
 
         logger.info(f"Attempting to connect to pool {self._pool} ...")
-        self._ioctx = self._handler.open_ioctx(self._pool)
+        
+        # Check if the pool exist
+        try:
+            self._ioctx = self._handler.open_ioctx(self._pool)
+        except rados.ObjectNotFound:
+            logger.critical(f"Pool \"{self._pool}\" does not exist")
+            raise
         logger.info("Connected")
 
         self._rbd = rbd.RBD()
 
         # support wildcard for images
+        pool_images = self._get_images()
         if len(self._images) == 1 and self._images[0] == '*':
             logger.info("Loading all images...")
             self._images = self._get_images()
+        
+        images_out_of_pool = list(set(self._images) - set(pool_images))        
+        # Check if the images that you want to do a backup of are in the pool
+        if len(images_out_of_pool) > 0 :
+            logger.critical(f"Images \"{images_out_of_pool}\" does not exist in the pool")
+            raise
 
 #######################################
 # Ceph basic interaction

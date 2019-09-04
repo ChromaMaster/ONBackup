@@ -78,10 +78,13 @@ def main():
     cluster_config = ceph_config["cluster"]
     backup_config = ceph_config["backup"]
 
-    cluster = ceph.ceph.Ceph(
-        cluster_config["conf_file"], cluster_config["user_keyring"],
-        cluster_config["client"], backup_config["pool"],
-        backup_config["images"], backup_config["directory"])
+    try:
+        cluster = ceph.ceph.Ceph(
+            cluster_config["conf_file"], cluster_config["user_keyring"],
+            cluster_config["client"], backup_config["pool"],
+            backup_config["images"], backup_config["directory"])
+    except:
+        sys.exit(1)
 
     backup_type = backup_config["type"]
     cluster.print_overview()
