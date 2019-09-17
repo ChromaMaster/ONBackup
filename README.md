@@ -42,6 +42,9 @@ This file will contain the following config by default
 
 ```yaml
 ---
+app:
+  verbose: False  
+  log_file: onbackup.log
 cluster:
   conf_file: "etc/ceph/ceph.conf"
   user_keyring: "etc/ceph/ceph.client.onebackup.keyring"
@@ -50,7 +53,7 @@ backup:
   type: full
   pool: ""
   directory: ""
-  images:
+  images:    
     - "*"
 ```
 
