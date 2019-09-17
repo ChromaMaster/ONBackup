@@ -18,7 +18,7 @@ your images datastore.
 
 - [x] Perform a ceph pool full backup
 - [x] Perform a ceph pool differential backup
-- [ ] Monitoring the process (PandoraFMS and/or Prometheus)
+- [x] Monitoring the process (PandoraFMS plugin and/or Prometheus)
 - [ ] Interact with the vms before the backup in order to flush mysql
 - [ ] Allow the user not only do the backup but also restoring
 
