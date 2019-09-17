@@ -64,8 +64,8 @@ program arguments.
 python main.py --help
 
 usage: main.py [-h] [--ceph PATH] [--user_keyring PATH] [--user USER]
-               [-p POOL] [-i IMAGES [IMAGES ...]] [-d DIRECTORY]
-               [--full | --diff]
+               [-p POOL] [-i IMAGES [IMAGES ...]] [-d DIRECTORY] [-v]
+               [--log-file LOG_FILE] [--full | --diff]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -77,6 +77,8 @@ optional arguments:
                         List of images to backup ('*' for all)
   -d DIRECTORY, --directory DIRECTORY
                         Target directory where backups will be stored
+  -v, --verbose         Make the program verbose
+  --log-file LOG_FILE   Set the logging file path
   --full                Perform a full image backup
   --diff                Perform a incremental image backup
 ```
