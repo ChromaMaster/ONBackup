@@ -1,9 +1,9 @@
 import logging
 logger = logging.getLogger(__name__)
 
-# from app.ceph import ceph
-from app.ceph import rados
-from app.ceph import rbd
+import rados
+import rbd
+
 
 from util.color import Color
 
@@ -26,7 +26,7 @@ class Ceph():
         self._handler = rados.Rados(
             conffile=conf_file, conf=dict(keyring=user_keyring), name=f"client.{client}")
 
-        logger.info("librados version: {}".format(str(self._handler.version())))
+        logger.debug("librados version: {}".format(str(self._handler.version())))
 
         # Connect to the cluster
         self.connect()
@@ -37,7 +37,7 @@ class Ceph():
         self._images = images
         self._backup_dir = Path(backup_dir)
         self._diffs_dir_name = "diffs"
-        self._dummy_snap_name = "dummy"            
+        self._dummy_snap_name = "dummy"                    
 
         logger.info(f"Attempting to connect to pool {self._pool} ...")
         
@@ -59,7 +59,7 @@ class Ceph():
         
         images_out_of_pool = list(set(self._images) - set(pool_images))        
         # Check if the images that you want to do a backup of are in the pool
-        if len(images_out_of_pool) > 0 :
+        if len(images_out_of_pool) > 0 :            
             logger.critical(f"Images \"{images_out_of_pool}\" does not exist in the pool")
             raise
 
@@ -106,13 +106,15 @@ class Ceph():
         current_timestamp = Ceph._get_current_timestamp()
         for image in self._images:            
             try:
+                logger.info(f"BACKUP - START - FULL - {image}")
                 # Check wheter image directory exists, if not, create it
                 self._check_image_dir(image)
 
                 # Export the image                
                 self._export_image(image, current_timestamp, self._get_image_backup_dir(image))
+                logger.info(f"BACKUP - END - FULL - {image}")
             except:
-                logger.info(f"Failed to do the full backup!")
+                logger.error(f"Failed to do the full backup!")
                 raise
     
     def full_diff_backup(self):
@@ -124,6 +126,7 @@ class Ceph():
         current_timestamp = Ceph._get_current_timestamp()
         for image in self._images:                    
             try:
+                logger.info(f"BACKUP - START - DIFF - {image}")
                 # Check wheter image differentials directory exists, if not, create it
                 self._check_image_diff_dir(image)
                 image_has_dummy = self._check_dummy_snap(image)
@@ -137,12 +140,12 @@ class Ceph():
                     self._create_dummy_snapshot(image)            
 
                 # Export the differential image
-                self._export_diff_image(image, current_timestamp, self._dummy_snap_name, self._get_image_diff_backup_dir(image))                
-
+                self._export_diff_image(image, current_timestamp, self._dummy_snap_name, self._get_image_diff_backup_dir(image))                                                
+                logger.info(f"BACKUP - END - DIFF - {image}")                
                 # Update the dummy snapshot
                 self._update_dummy_snapshot(image)
             except:
-                logger.info(f"Failed to do the full diff backup!")
+                logger.error(f"Failed to do the full diff backup!")
                 raise
 
     def print_overview(self):

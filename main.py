@@ -3,7 +3,7 @@ import os
 import sys
 os.environ['BASE_PATH'] = os.path.abspath(os.path.dirname(__file__))
 
-from app import ceph
+import app
 
 import logging
 logger = logging.getLogger(__name__)
@@ -37,6 +37,16 @@ def parse_args(parser: ArgumentParser, ceph_config: dict):
         '-d',
         '--directory',
         help="Target directory where backups will be stored")
+    parser.add_argument(
+        '-v',
+        '--verbose',
+        action="store_true",
+        default=ceph_config["app"]["verbose"],
+        help="Make the program verbose")
+    parser.add_argument(
+        '--log-file',
+        default=ceph_config["app"]["log_file"],
+        help="Set the logging file path")
 
     # GROUP FULL AND DIFF
     backup_type_group = parser.add_mutually_exclusive_group()
@@ -50,6 +60,9 @@ def parse_args(parser: ArgumentParser, ceph_config: dict):
     args = parser.parse_args()
 
     # Use the values provided by the current config file (or default if not exists)
+    ceph_config["app"]["verbose"] = args.verbose
+    ceph_config["app"]["log_file"] = args.log_file
+
     ceph_config["cluster"]["conf_file"] = args.ceph
     ceph_config["cluster"]["user_keyring"] = args.user_keyring
     ceph_config["cluster"]["user"] = args.user
@@ -72,14 +85,13 @@ def parse_args(parser: ArgumentParser, ceph_config: dict):
         ceph_config["backup"]["directory"] = args.directory
 
 
-def main():
-    ceph_config = ceph.load_config()
+def main(ceph_config):
 
     cluster_config = ceph_config["cluster"]
     backup_config = ceph_config["backup"]
 
     try:
-        cluster = ceph.ceph.Ceph(
+        cluster = app.ceph.Ceph(
             cluster_config["conf_file"], cluster_config["user_keyring"],
             cluster_config["client"], backup_config["pool"],
             backup_config["images"], backup_config["directory"])
@@ -101,15 +113,17 @@ if __name__ == "__main__":
     parser = ArgumentParser()
 
     # Get config from config file
-    ceph_config = ceph.load_config()
+    ceph_config = app.load_config()
 
     # Override with the user args
     parse_args(parser, ceph_config)
 
-    # Checks if config has all the required fields
     try:
-        ceph.check_config(ceph_config)
+        # Setup the application
+        app.setup_app(ceph_config["app"])
+        # Checks if config has all the required fields
+        app.check_config(ceph_config)
     except:
         sys.exit(1)
 
-    main()
+    main(ceph_config)
