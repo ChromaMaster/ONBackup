@@ -58,8 +58,18 @@ def check_config(config):
         # logger.warning("Logging level not set")
         app_config["verbose"] = False
 
-    logger.info("Checking the ceph config...")
+    # Checks if the cluster config exists
+    logger.info("Checking the cluster config...")    
+    cluster_config = config["cluster"]
+    if not Path(cluster_config["conf_file"]).exists():
+        logger.critical(f"Ceph config file \"{cluster_config['conf_file']}\" does not exist")
+        raise
+    if not Path(cluster_config["user_keyring"]).exists():
+        logger.critical(f"User keyring file \"{cluster_config['user_keyring']}\" does not exist")
+        raise
+
     # Checks if there are blank values into the config
+    logger.info("Checking the ceph config...")
     backup_config = config["backup"]
     if not backup_config["pool"].strip():
         logger.critical("Backup pool not set")

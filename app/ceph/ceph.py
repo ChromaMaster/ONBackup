@@ -29,7 +29,11 @@ class Ceph():
         logger.debug("librados version: {}".format(str(self._handler.version())))
 
         # Connect to the cluster
-        self.connect()
+        try:
+            self.connect()
+        except:
+            logger.critical(f"Cannot connect to the cluster")
+            raise
 
         # Backup parameters
         self._pool = pool
@@ -70,16 +74,17 @@ class Ceph():
         """ Connect to the ceph cluster """
         logger.info("Will attempt to connect to: {}".format(
             str(self._handler.conf_get("mon initial members"))))
-
-        self._handler.connect()
-        logger.info("Connected. cluster ID [{}]".format(
-            self._handler.get_fsid().decode("utf-8")))
+        try:
+            self._handler.connect()
+            logger.info("Connected. cluster ID [{}]".format(
+                self._handler.get_fsid().decode("utf-8")))
+        except Exception as e:
+            raise
 
     def print_stats(self):
         print("\nCluster Statistics")
         print("==================")
         cluster_stats = self._handler.get_cluster_stats()
-
         for key, value in cluster_stats.items():
             print(key, value)
 
@@ -393,7 +398,7 @@ class Ceph():
         logger.info(f"Executing command: {' '.join(command)}")
         p = subprocess.run(command,  capture_output=True)
         if p.returncode != 0:
-            logger.critical(f"Failed to export snapshot {fullal_snapshot_name}: {p.stderr}")
+            logger.critical(f"Failed to export snapshot {full_snapshot_name}: {p.stderr}")
             raise Exception
 
     def _export_diff_snapshot(self, image_name: str, snapshot_name: str, from_snapshot_name:str, export_dir):
@@ -441,7 +446,7 @@ class Ceph():
         logger.info(f"Executing command: {' '.join(command)}")
         p = subprocess.run(command,  capture_output=True)
         if p.returncode != 0:
-            logger.critical(f"Failed to export snapshot {fullal_snapshot_name}: {p.stderr}")
+            logger.critical(f"Failed to export snapshot {full_snapshot_name}: {p.stderr}")
             raise Exception
 
     def get_pool_stats(self):
