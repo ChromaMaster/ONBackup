@@ -18,7 +18,7 @@ your images datastore.
 
 - [x] Perform a ceph pool full backup
 - [x] Perform a ceph pool differential backup
-- [ ] Monitoring the process (PandoraFMS and/or Prometheus)
+- [x] Monitoring the process (PandoraFMS plugin and/or Prometheus)
 - [ ] Interact with the vms before the backup in order to flush mysql
 - [ ] Allow the user not only do the backup but also restoring
 
@@ -42,6 +42,9 @@ This file will contain the following config by default
 
 ```yaml
 ---
+app:
+  verbose: False  
+  log_file: onbackup.log
 cluster:
   conf_file: "etc/ceph/ceph.conf"
   user_keyring: "etc/ceph/ceph.client.onebackup.keyring"
@@ -50,7 +53,7 @@ backup:
   type: full
   pool: ""
   directory: ""
-  images:
+  images:    
     - "*"
 ```
 
@@ -64,8 +67,8 @@ program arguments.
 python main.py --help
 
 usage: main.py [-h] [--ceph PATH] [--user_keyring PATH] [--user USER]
-               [-p POOL] [-i IMAGES [IMAGES ...]] [-d DIRECTORY]
-               [--full | --diff]
+               [-p POOL] [-i IMAGES [IMAGES ...]] [-d DIRECTORY] [-v]
+               [--log-file LOG_FILE] [--full | --diff]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -77,6 +80,8 @@ optional arguments:
                         List of images to backup ('*' for all)
   -d DIRECTORY, --directory DIRECTORY
                         Target directory where backups will be stored
+  -v, --verbose         Make the program verbose
+  --log-file LOG_FILE   Set the logging file path
   --full                Perform a full image backup
   --diff                Perform a incremental image backup
 ```
